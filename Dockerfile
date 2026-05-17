@@ -17,24 +17,18 @@ ENV UV_LINK_MODE=copy
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install the project's dependencies using the lockfile and settings
-ARG RAILWAY_SERVICE_ID
-RUN --mount=type=cache,id=s/1debe0ef-368c-4295-9198-1b72c47c7289-/root/cache/uv,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-group dev
+# Cache location for uv (no --mount=type=cache needed)
+ENV UV_CACHE_DIR=/tmp/uv-cache
 
 # Copy only requirements to cache them in docker layer
 COPY uv.lock pyproject.toml /app/
 
-# Sync the project
-RUN --mount=type=cache,id=s/1debe0ef-368c-4295-9198-1b72c47c7289-/root/cache/uv,target=/root/.cache/uv \
-    uv sync --frozen --no-group dev
+# Install the project's dependencies using the lockfile and settings
+RUN uv sync --frozen --no-install-project --no-group dev
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 ENV HOME=/app
-ENV UV_CACHE_DIR=/tmp/uv-cache
 
 # Create non-root user and set ownership
 RUN addgroup --system app && adduser --system --group app && mkdir -p /tmp/uv-cache && chown -R app:app /app /tmp/uv-cache
@@ -46,6 +40,9 @@ COPY --chown=app:app docker/ /app/docker/
 COPY --chown=app:app alembic.ini /app/alembic.ini
 # Copy config files - this will copy config.toml if it exists, and config.toml.example
 COPY --chown=app:app config.toml* /app/
+
+# Sync the project (now with source code present)
+RUN uv sync --frozen --no-group dev
 
 # Switch to non-root user
 USER app
