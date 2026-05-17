@@ -7,10 +7,6 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 
-[options]
-exclude-newer = "2026-05-09T19:09:35.818254Z"
-exclude-newer-span = "P5D"
-
 [manifest]
 members = [
     "honcho",
