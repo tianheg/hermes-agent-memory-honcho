@@ -19,7 +19,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install the project's dependencies using the lockfile and settings
 ARG RAILWAY_SERVICE_ID
-RUN --mount=type=cache,id=s/${RAILWAY_SERVICE_ID}-root-cache-uv,target=/root/.cache/uv \
+RUN --mount=type=cache,id=s/hermes-agent-memory-honcho-/root/cache/uv,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-group dev
@@ -28,7 +28,7 @@ RUN --mount=type=cache,id=s/${RAILWAY_SERVICE_ID}-root-cache-uv,target=/root/.ca
 COPY uv.lock pyproject.toml /app/
 
 # Sync the project
-RUN --mount=type=cache,id=s/${RAILWAY_SERVICE_ID}-root-cache-uv,target=/root/.cache/uv \
+RUN --mount=type=cache,id=s/hermes-agent-memory-honcho-/root/cache/uv,target=/root/.cache/uv \
     uv sync --frozen --no-group dev
 
 # Place executables in the environment at the front of the path
